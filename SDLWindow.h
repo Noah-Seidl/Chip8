@@ -4,8 +4,8 @@
 #include <SDL2/SDL.h>
 
 #define WINDOW_TITLE "Noahs Emulator"
-#define SCREEN_WIDTH 1000
-#define SCREEN_HEIGHT 1000
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 512
 #define FONT_SIZE 80
 
 typedef struct 

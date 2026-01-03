@@ -1,8 +1,10 @@
 #include "test.h"
 
-void testWindow(Window *window)
+void testWindow(Window *window, char *filename)
 {
-    char *dropped_filedir;
+
+    Chip8 chip = initChip8(filename);
+
     while (true)
     {
         SDL_Event event;
@@ -13,22 +15,18 @@ void testWindow(Window *window)
             case SDL_QUIT:
                 cleanup(window);
                 break;
-            
-            case SDL_DROPFILE:
-                dropped_filedir = event.drop.file;
-                SDL_Log("Dropped %s",dropped_filedir);
-                
-                SDL_free(dropped_filedir);
-
-                break;
 
             default:
                 break;
             }
 
-        }
-        
-        
+        }        
+
+
+
+
+
+
         SDL_SetRenderDrawColor(window->renderer,255,0,255,255);
         SDL_RenderClear(window->renderer);
         SDL_RenderPresent(window->renderer);
