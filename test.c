@@ -5,6 +5,7 @@ void testWindow(Window *window, char *filename)
 
     Chip8 chip = initChip8(filename);
 
+
     while (true)
     {
         SDL_Event event;
@@ -21,9 +22,8 @@ void testWindow(Window *window, char *filename)
             }
 
         }        
-
-
-
+        
+    execute(&chip, 1);
 
 
 
