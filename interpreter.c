@@ -3,6 +3,8 @@
 #include "dragdrop.h"
 #include "test.h"
 
+void readFile(char *filename);
+
 int main()
 {    
 
@@ -11,7 +13,7 @@ int main()
     initSDL(&window);
 
     char *filename = openWindowDragandDrop(&window);
-
+    
     printf("%s\n", filename);    
 
 
@@ -19,4 +21,17 @@ int main()
 
 
     return 0;
+}
+
+void readFile(char *filename)
+{
+    FILE *fptr = fopen(filename, "rb");
+
+    if(fptr == NULL)
+    return;
+    
+
+    
+
+
 }

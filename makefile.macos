@@ -1,0 +1,17 @@
+CC = clang
+
+CFLAGS = -g -O0 -Wall -MMD -MP $(shell pkg-config --cflags sdl2)
+LDFLAGS = $(shell pkg-config --libs sdl2)
+
+PROGRAM = programmMac
+OBJECTS = interpreter.o SDLWindow.o dragdrop.o test.o
+
+default: $(PROGRAM)
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $(PROGRAM) $(LDFLAGS)
+
+clean:
+	rm -f $(OBJECTS) $(OBJECTS:.o=.d) $(PROGRAM)
+
+-include $(OBJECTS:.o=.d)
