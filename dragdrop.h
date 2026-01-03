@@ -1,0 +1,1 @@
+char *openWindowDragandDrop(Window *window);

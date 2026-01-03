@@ -1,7 +1,7 @@
-CFLAGS=-O0 -MMD -MP -Wall #-fsanitize=address
-LDFLAGS=-lSDL2 -lSDL2_ttf
+CFLAGS=-O3 -MMD -MP -Wall #-fsanitize=address
+LDFLAGS=-lSDL3
 PROGRAMS=programm
-OBJECTS=interpreter.o SDLWindow.o dragdrop.o test.o
+OBJECTS=main.o
 
 ALLOBJECTS=$(OBJECTS) $(patsubst %,%.o, $(PROGRAMS))
 
@@ -11,6 +11,6 @@ clean:
 	-rm -f $(ALLOBJECTS) $(ALLOBJECTS:%.o=%.d) $(PROGRAMS)
 
 programm: $(OBJECTS)
-	gcc -g $(CFLAGS) $(LDFLAGS) -o programm $(OBJECTS)
+	gcc $(CFLAGS) $(LDFLAGS) -o programm $(OBJECTS)
 
 -include $(ALLOBJECTS:%.o=%.d)

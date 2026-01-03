@@ -11,6 +11,6 @@ clean:
 	-rm -f $(ALLOBJECTS) $(ALLOBJECTS:%.o=%.d) $(PROGRAMS)
 
 programm: $(OBJECTS)
-	gcc $(CFLAGS) $(LDFLAGS) -o programm $(OBJECTS)
+	gcc -g $(CFLAGS) $(LDFLAGS) -o programm $(OBJECTS)
 
 -include $(ALLOBJECTS:%.o=%.d)
