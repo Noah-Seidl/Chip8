@@ -11,7 +11,7 @@
 
 typedef struct 
 {
-    uint16_t memory[4096]; //um programm in memory zu laden
+    uint8_t memory[4096]; //um programm in memory zu laden
     size_t memorylength;
     int PC; //stackpointer der auf oppcodes in memory zeigt
     uint8_t V[16]; //registers

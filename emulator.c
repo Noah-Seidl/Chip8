@@ -19,44 +19,32 @@ Chip8 initChip8(char *filename)
     
     printf("Filesize %ld \n", filesize);
 
-    uint8_t *buffer = (uint8_t *) malloc(filesize);
 
-    fread(buffer, 1, filesize, fptr);
+    fread(&chip.memory[0x200], 1, filesize, fptr);
 
     fclose(fptr);
 
-    //convert to uint16 2bte opcode
-    long num_opcodes = filesize >> 1;
+
 
     //inti Chip struct
-
-    //memory init
-    for (size_t i = 0; i < num_opcodes; i++)
-    {
-        //                              zuerst nach link schieben Bigendian
-        chip.memory[i] = buffer[i * 2] << 8 | buffer[i * 2 + 1];
-    }
-    chip.memorylength = num_opcodes;
-    
-    chip.PC = 0;
+    chip.PC = 0x200;
     chip.I = 0;
     chip.stackpointer = 0;
 
-    for (int i = 0; i < 10 && i < chip.memorylength; i++) {
+    for (int i = 0x200; i < 10 + 0x200 && i < chip.memorylength; i++) {
         printf("0x%04X \t", chip.memory[i]);
         printBits(chip.memory[i]);
         printf("\n");
     }
+    srand(time(NULL));
 
-    free(buffer);
     return chip;
 }
 
 int execute(Chip8 *chip,int key)
 {
-    srand(time(NULL));
 
-    uint16_t opcode = chip->memory[chip->PC];
+    uint16_t opcode = chip->memory[chip->PC] << 8 | chip->memory[chip->PC + 1];
     
     if(opcode == 12 * 16)
     {
@@ -96,37 +84,37 @@ int execute(Chip8 *chip,int key)
         //calls to subroutine
         case 2:
             printf("Address: %d \n", NNN);
-            chip->PC = NNN / 2;
+            chip->PC = NNN;
             chip->Stack[chip->stackpointer++] = chip->PC;
             return 0;
 
         case 3:
             if(chip->V[x] == NN)
-                chip->PC++;
-            chip->PC++;
+                chip->PC += 2;
+            chip->PC += 2;
             return 0;
 
         case 4: 
             if(chip->V[x] != NN)
-                chip->PC++;
-            chip->PC++;
+                chip->PC += 2;
+            chip->PC += 2;
             return 0;
 
         case 5:
             if(chip->V[x] == chip->V[y])
-                chip->PC++;
-            chip->PC++;
+                chip->PC += 2;
+            chip->PC += 2;
             return 0;
 
 
         case 6:
             chip->V[x] = NN;
-            chip->PC++;
+            chip->PC += 2;
             return 0;
 
         case 7:
             chip->V[x] += NN;
-            chip->PC++;
+            chip->PC += 2;
             return 0;
 
         case 8:
@@ -134,22 +122,22 @@ int execute(Chip8 *chip,int key)
             {
             case 0:
                 chip->V[x] = chip->V[y];
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
 
             case 1:
                 chip->V[x] = chip->V[x] | chip->V[y];
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
             
             case 2:
                 chip->V[x] = chip->V[x] & chip->V[y];
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
             
             case 3:
                 chip->V[x] = chip->V[x] ^ chip->V[y];
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
 
             case 4:
@@ -160,7 +148,7 @@ int execute(Chip8 *chip,int key)
 
                 chip->V[x] += chip->V[y];
 
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
 
             case 5:
@@ -171,14 +159,14 @@ int execute(Chip8 *chip,int key)
 
                 chip->V[x] -= chip->V[y];
 
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
 
             case 6:
                 chip->V[15] = chip->V[x] & 1;
                 chip->V[x] >>= 1;
 
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
 
             case 7:
@@ -189,14 +177,14 @@ int execute(Chip8 *chip,int key)
 
                 chip->V[x] = chip->V[y] - chip->V[x];
 
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
 
             case 15:
                 chip->V[15] = (chip->V[x] >> 7) & 1;    
                 chip->V[x] <<= 1;
 
-                chip->PC++;
+                chip->PC += 2;
                 return 0;
 
             default:
@@ -205,13 +193,13 @@ int execute(Chip8 *chip,int key)
 
         case 9:
             if(chip->V[x] != chip->V[y])
-                chip->PC++;
-            chip->PC++;
+                chip->PC += 2;
+            chip->PC += 2;
             return 0;
 
         case 10: 
             chip->I = NNN;
-            chip->PC++;
+            chip->PC += 2;
             return 0;
 
         case 11:
@@ -221,12 +209,12 @@ int execute(Chip8 *chip,int key)
         case 12:
             int random = rand() % 256;
             chip->V[x] = random & NN;
-            chip->PC++;
+            chip->PC += 2;
             return 0;
 
         case 13:
             draw(x,y,d, chip);
-            chip->PC++;
+            chip->PC += 2;
             return 0;            
 
 

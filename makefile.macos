@@ -4,7 +4,7 @@ CFLAGS = -g -O0 -Wall -MMD -MP $(shell pkg-config --cflags sdl2)
 LDFLAGS = $(shell pkg-config --libs sdl2)
 
 PROGRAM = programmMac
-OBJECTS = interpreter.o SDLWindow.o dragdrop.o test.o
+OBJECTS = main.o SDLWindow.o dragdrop.o test.o emulator.o
 
 default: $(PROGRAM)
 

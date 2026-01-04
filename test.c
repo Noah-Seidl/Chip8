@@ -17,6 +17,13 @@ void testWindow(Window *window, char *filename)
                 cleanup(window);
                 break;
 
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.scancode) {
+                    case SDL_SCANCODE_SPACE:
+                        printf("Space pressed\n");
+                        break;
+                }
+                
             default:
                 break;
             }
