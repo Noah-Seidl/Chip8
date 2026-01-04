@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
-
+#include <string.h>
 
 
 typedef struct 
@@ -19,9 +19,9 @@ typedef struct
     uint16_t I;
     uint16_t Stack[16];
     uint8_t stackpointer;
-
+    int timer;
     uint8_t display[64 * 32];
-
+    int waitingforkey;
 
 }Chip8;
 

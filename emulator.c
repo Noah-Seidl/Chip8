@@ -1,12 +1,14 @@
 #include "emulator.h"
 
 void printBits(uint16_t value);
+void dispclear(Chip8 *chip);
+void initFontset(Chip8 *chip);
 
 
 Chip8 initChip8(char *filename)
 {
     Chip8 chip;
-
+    memset(&chip, 0, sizeof(Chip8)); 
     //read hex File
     FILE *fptr = fopen(filename, "rb");
 
@@ -24,12 +26,16 @@ Chip8 initChip8(char *filename)
 
     fclose(fptr);
 
-
+    initFontset(&chip);
 
     //inti Chip struct
     chip.PC = 0x200;
     chip.I = 0;
     chip.stackpointer = 0;
+    chip.waitingforkey = -1;
+    dispclear(&chip);
+
+
 
     for (int i = 0x200; i < 10 + 0x200 && i < chip.memorylength; i++) {
         printf("0x%04X \t", chip.memory[i]);
@@ -43,19 +49,38 @@ Chip8 initChip8(char *filename)
 
 int execute(Chip8 *chip,int key)
 {
-
+    printf("Execute\n");
+    if (chip->timer > 0)
+    {
+        chip->timer--;
+    }
+    
+    if(chip->waitingforkey >= 0)
+    {
+        printf("KEYWAITING");
+        if(key != 0)   
+        {
+            chip->V[chip->waitingforkey] = key;
+            chip->PC += 2;
+            chip->waitingforkey = -1;
+        }else
+            return 0;
+    }
     uint16_t opcode = chip->memory[chip->PC] << 8 | chip->memory[chip->PC + 1];
     
-    if(opcode == 12 * 16)
+    if(opcode == 0x00E0)
     {
         //DISPLAY clear
+        dispclear(chip);
+        chip->PC += 2;
         return 20;
     }
 
 
-    if(opcode == 12 * 16 + 12)
+    if(opcode == 0x00EE)
     {
         chip->PC = chip->Stack[--chip->stackpointer];
+        chip->PC += 2;
         return 1;
     }
 
@@ -78,14 +103,16 @@ int execute(Chip8 *chip,int key)
 
     switch (a)
     {
+        //Jumps to address
         case 1:
             chip->PC = NNN;
             return 0;
+
         //calls to subroutine
         case 2:
             printf("Address: %d \n", NNN);
-            chip->PC = NNN;
             chip->Stack[chip->stackpointer++] = chip->PC;
+            chip->PC = NNN;
             return 0;
 
         case 3:
@@ -152,13 +179,12 @@ int execute(Chip8 *chip,int key)
                 return 0;
 
             case 5:
-                if(chip->V[x] - chip->V[y] < 0)
+                if(chip->V[x] >= chip->V[y])
                     chip->V[15] = 1;
                 else
                     chip->V[15] = 0;
 
                 chip->V[x] -= chip->V[y];
-
                 chip->PC += 2;
                 return 0;
 
@@ -170,7 +196,7 @@ int execute(Chip8 *chip,int key)
                 return 0;
 
             case 7:
-                if(chip->V[y] - chip->V[x]< 0)
+                if(chip->V[y] >= chip->V[x])
                     chip->V[15] = 1;
                 else
                     chip->V[15] = 0;
@@ -213,11 +239,83 @@ int execute(Chip8 *chip,int key)
             return 0;
 
         case 13:
-            draw(x,y,d, chip);
+            chip->V[0xF] = 0;
+            int px = chip->V[x];     // Wert von VX
+            int py = chip->V[y];     // Wert von VY
+            draw(px,py,d, chip);
             chip->PC += 2;
             return 0;            
 
+        case 14:
+            printf("TASTE: %d | KEY: %d\n", chip->V[x], key);
 
+            if(y == 9 && d == 0xE)
+                if(key == chip->V[x])
+                    chip->PC += 2;
+
+            if(y == 0xA && d == 1)
+                if(key != chip->V[x])
+                    chip->PC += 2;
+
+            chip->PC += 2;
+            return 0;
+
+        case 15:
+            switch (NN)
+            {
+            case 0x07:
+                chip->V[x] = chip->timer;
+                chip->PC += 2;
+                return 0;
+
+            case 0x0A:
+                chip->waitingforkey = x;
+                return 0;
+
+            case 0x15:
+                chip->timer = chip->V[x];
+                chip->PC += 2;
+                return 0;  
+
+            case 0x18:
+                chip->PC += 2;
+                return 0;  
+
+            case 0x1E:
+                chip->I += chip->V[x];
+                chip->PC += 2;
+                return 0;  
+                
+            case 0x29:
+                chip->I = 0x050 + (chip->V[x] & 0x0F) * 5;
+                chip->PC += 2;
+                return 0;   
+
+            case 0x33:
+                chip->memory[chip->I] = chip->V[x] / 100;
+                chip->memory[chip->I + 1] = (chip->V[x] / 10) % 10;
+                chip->memory[chip->I + 2] = chip->V[x] % 10;
+                chip->PC += 2;
+                return 0;   
+
+            case 0x55:
+                for (uint16_t i = 0; i <= x; i++)
+                {
+                    chip->memory[chip->I + i] = chip->V[i];
+                }
+                chip->PC += 2;
+                return 0;   
+            case 0x65:
+                for (uint16_t i = 0; i <= x; i++)
+                {
+                    chip->V[i] = chip->memory[chip->I + i];
+                }
+                chip->PC += 2;
+                return 0;   
+
+            default:
+                break;
+            }                
 
     default:
         break;
@@ -228,6 +326,15 @@ int execute(Chip8 *chip,int key)
 
     return 1;
 }
+
+void dispclear(Chip8 *chip)
+{
+    for (int i = 0; i < 64 * 32; i++)
+    {
+        chip->display[i] = 0;
+    }
+}
+
 
 void draw(int x, int y, int height, Chip8 *chip)
 {
@@ -260,4 +367,28 @@ void printBits(uint16_t value) {
         printf("%d", (value >> i) & 1);
         if (i % 4 == 0 && i > 0) printf(" ");  // Leerzeichen alle 4 Bits
     }
+}
+
+
+void initFontset(Chip8 *chip)
+{
+    uint8_t fontset[80] = {
+        0xF0, 0x90, 0x90, 0x90, 0xF0,  // 0
+        0x20, 0x60, 0x20, 0x20, 0x70,  // 1
+        0xF0, 0x10, 0xF0, 0x80, 0xF0,  // 2
+        0xF0, 0x10, 0xF0, 0x10, 0xF0,  // 3
+        0x90, 0x90, 0xF0, 0x10, 0x10,  // 4
+        0xF0, 0x80, 0xF0, 0x10, 0xF0,  // 5
+        0xF0, 0x80, 0xF0, 0x90, 0xF0,  // 6
+        0xF0, 0x10, 0x20, 0x40, 0x40,  // 7
+        0xF0, 0x90, 0xF0, 0x90, 0xF0,  // 8
+        0xF0, 0x90, 0xF0, 0x10, 0xF0,  // 9
+        0xF0, 0x90, 0xF0, 0x90, 0x90,  // A
+        0xE0, 0x90, 0xE0, 0x90, 0xE0,  // B
+        0xF0, 0x80, 0x80, 0x80, 0xF0,  // C
+        0xE0, 0x90, 0x90, 0x90, 0xE0,  // D
+        0xF0, 0x80, 0xF0, 0x80, 0xF0,  // E
+        0xF0, 0x80, 0xF0, 0x80, 0x80   // F
+    };
+    memcpy(&chip->memory[0x50], fontset, 80);
 }
