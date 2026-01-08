@@ -51,10 +51,13 @@ void chip8Display(Window *window, char *filename)
             }
 
         }        
+
         //wäre auch besser wenn man nur immer den display updatet wenn wirklich das display sich auch im chip verändert
         //ansonsten kann man ja befehle nur alle 60 mal pro sekunde aufrufen 
         //also eigentlich am besten schleife in chip8Display execute und sie returnt nur bei display changes?
+        //aber dann würde man keine tasten inputs mehr verarbeiten können
         //Chip befehlt befehl mit key übergabe au
+        
         execute(&chip, key);
 
         //key muss auf nichtbenutzen wert gesetz werden da sonst sozusagen der key solange kein anderer gedrückt wird göeich bleibt
@@ -67,7 +70,7 @@ void chip8Display(Window *window, char *filename)
  
 
 
-        SDL_Delay(16);
+        SDL_Delay(16); //16ms 60 mal in der sekunde
     }
     
 }

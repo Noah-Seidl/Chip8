@@ -63,7 +63,7 @@ int execute(Chip8 *chip,int key)
             chip->PC += 2;
             chip->waitingforkey = -1;
         }else
-            return 0;
+            return 100;
     }
 
     //hier wird der Opcde in eine variable gespeichert weil er 2 Bytes groß ist
@@ -75,7 +75,7 @@ int execute(Chip8 *chip,int key)
         //DISPLAY clear
         dispclear(chip);
         chip->PC += 2;
-        return 20;
+        return 100;
     }
 
     //kommt von eine subroutine zurück nimmt daher den PC vom stack wieder runter 
@@ -100,7 +100,7 @@ int execute(Chip8 *chip,int key)
     uint16_t NN = (opcode & 0x00FF);
 
     //Hier würde man den opcode angezeigt bekommen
-    //printf("%d | %d | %d | %d\n",a,x,y,d);
+    printf("%d | %d | %d | %d\n",a,x,y,d);
 
 
 
@@ -262,7 +262,7 @@ int execute(Chip8 *chip,int key)
             int py = chip->V[y];     // Wert von VY
             draw(px,py,d, chip);
             chip->PC += 2;
-            return 0;            
+            return 100;            
 
         //Tasten werden hier abgeprüft also key sonst überspringt er nächsten opcode
         case 0x0E:
@@ -276,7 +276,7 @@ int execute(Chip8 *chip,int key)
                     chip->PC += 2;
 
             chip->PC += 2;
-            return 0;
+            return 100;
 
         //weitere Opcodes
         case 0x0F:
