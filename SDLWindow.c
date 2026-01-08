@@ -1,5 +1,6 @@
 #include "SDLWindow.h"
 
+//SDL Cleanup funktion
 void cleanup(Window *window)
 {
     SDL_DestroyRenderer(window->renderer);
@@ -8,6 +9,7 @@ void cleanup(Window *window)
     exit(EXIT_SUCCESS);
 }
 
+//SDL init
 void initSDL(Window *window)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
