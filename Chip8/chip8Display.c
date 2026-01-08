@@ -80,6 +80,10 @@ void renderDisplay(Window *window, Chip8 *chip)
 {
     int x = 0,y = 0;
 
+    //ohne jedesmal clearen verursacht es rauschen an den rändern
+    SDL_SetRenderDrawColor(window->renderer, 255, 255, 255, 255);
+    SDL_RenderClear(window->renderer);
+
     for (size_t i = 0; i < 64*32; i++)
     {
         x = i % 64;
