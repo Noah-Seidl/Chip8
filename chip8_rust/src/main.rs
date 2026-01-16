@@ -1,10 +1,10 @@
-mod Emulator_Cpu;
-mod SDLUtil;
-mod EmulatorGrafik;
+mod emulator_cpu;
+mod sdl_util;
+mod emulator_grafik;
 
 fn main() {
     println!("Hello, world!");
-    let filename = SDLUtil::SDLUtil::Drag_Drop();
+    let filename = sdl_util::SDLUtil::drag_drop();
 
     let (filename, mut canvas, sdl_context) = match filename {
         Some(data) => {
@@ -18,11 +18,11 @@ fn main() {
     };
  
     
-    let mut chip = Emulator_Cpu::Chip8::new(filename);
+    let mut chip = emulator_cpu::Chip8::new(filename);
 
     
 
-    EmulatorGrafik::Grafik::emulator_mainloop(&mut canvas, sdl_context, &mut chip);
+    emulator_grafik::Grafik::emulator_mainloop(&mut canvas, sdl_context, &mut chip);
 
 
 

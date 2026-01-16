@@ -8,4 +8,4 @@ rand = "0.9.2"
 
 [dependencies.sdl2]
 version = "0.38"
-features = ["use-pkgconfig"]
+features = ["use-pkgconfig", "static-link"]
