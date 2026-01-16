@@ -63,7 +63,6 @@ impl Grafik{
         // The rest of the game loop goes here...
 
         Chip8::execute(chip, &keys);
-        keys.clear();
         render_display(canvas, chip);
 
 
