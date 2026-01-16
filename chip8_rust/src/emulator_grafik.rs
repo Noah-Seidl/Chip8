@@ -8,6 +8,7 @@ use sdl2::video::Window;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::render::Canvas;
+use std::collections::HashSet;
 use std::time::Duration;
 
 use crate::emulator_cpu::Chip8;
@@ -25,7 +26,8 @@ impl Grafik{
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut keys: Vec<u8> = Vec::new();
+    let mut keys: HashSet<u8> = HashSet::new();
+    
 
     loop {
         canvas.set_draw_color(Color::RGB(255, 64, 255));
@@ -35,10 +37,21 @@ impl Grafik{
                 Event::Quit {..} => {return ;}  //Kann in switch cases verwendet werden um keine code dupplication zu verursachen
                 Event::KeyDown {keycode: Some(key), ..} => {
                     match key {
-                        Keycode::A => {keys.push(5);}
-                        Keycode::Q => {keys.push(4);}
-                        Keycode::D => {keys.push(6);}
-                        Keycode::SPACE =>{keys.push(1);}
+                        Keycode::A => {keys.insert(5);}
+                        Keycode::Q => {keys.insert(4);}
+                        Keycode::D => {keys.insert(6);}
+                        Keycode::SPACE =>{keys.insert(1);}
+                        Keycode::ESCAPE => {return;}
+
+                        _ => {}
+                    }
+                }
+                Event::KeyUp {keycode: Some(key), ..} => {
+                    match key {
+                        Keycode::A => {keys.remove(&5);}
+                        Keycode::Q => {keys.remove(&4);}
+                        Keycode::D => {keys.remove(&6);}
+                        Keycode::SPACE =>{keys.remove(&1);}
                         Keycode::ESCAPE => {return;}
 
                         _ => {}

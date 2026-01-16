@@ -1,4 +1,5 @@
 use std::fs;
+use std::collections::HashSet;
 
 
 pub struct Chip8{
@@ -48,7 +49,7 @@ impl Chip8{
         chip
     }
     
-    pub fn execute(&mut self, keys: &[u8])
+    pub fn execute(&mut self,keys: &HashSet<u8>)
     {
         //println!("KEYS PRESSED {:?}", keys.to_ascii_lowercase());
         if self.timer > 0
@@ -58,7 +59,7 @@ impl Chip8{
 
         if self.waiting_key{
             if keys.len() > 0{
-                self.v[self.target_key as usize] = *keys.first().expect("Fehler waiting keys");
+                self.v[self.target_key as usize] = *keys.iter().next().expect("fehler Keys");
                 self.waiting_key = false;
             }else{
                 return;
